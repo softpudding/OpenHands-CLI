@@ -46,6 +46,14 @@ def main() -> None:
     parser = create_main_parser()
     args = parser.parse_args()
 
+    # Validate headless mode requirements
+    if args.headless and not args.task and not args.file:
+        parser.error("--headless requires either --task or --file to be specified")
+
+    # Automatically set exit_without_confirmation when headless mode is used
+    if args.headless:
+        args.exit_without_confirmation = True
+
     try:
         if args.command == "serve":
             # Import gui_launcher only when needed
@@ -71,6 +79,7 @@ def main() -> None:
                     always_approve=args.always_approve,
                     llm_approve=args.llm_approve,
                     exit_without_confirmation=args.exit_without_confirmation,
+                    headless=args.headless,
                 )
                 print("Goodbye! 👋")
                 print(f"Conversation ID: {conversation_id.hex}")
@@ -87,7 +96,10 @@ def main() -> None:
                 # Determine confirmation mode from args
                 # Default is "always-ask" (handled in setup_conversation)
                 confirmation_policy: ConfirmationPolicyBase = AlwaysConfirm()
-                if args.always_approve:
+                if args.headless:
+                    # Headless mode always uses NeverConfirm (auto-approve)
+                    confirmation_policy = NeverConfirm()
+                elif args.always_approve:
                     confirmation_policy = NeverConfirm()
                 elif args.llm_approve:
                     confirmation_policy = ConfirmRisky(threshold=SecurityRisk.HIGH)
