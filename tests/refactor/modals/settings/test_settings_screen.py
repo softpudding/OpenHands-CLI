@@ -15,8 +15,8 @@ from textual.css.query import NoMatches
 from textual.widgets import Button, Static
 
 from openhands.sdk import LLM, Agent
-from openhands_cli.refactor.modals.settings import settings_screen as ss
-from openhands_cli.refactor.modals.settings.settings_screen import SettingsScreen
+from openhands_cli.tui.modals.settings import settings_screen as ss
+from openhands_cli.tui.modals.settings.settings_screen import SettingsScreen
 
 
 #
@@ -63,7 +63,7 @@ def fake_agent_store(monkeypatch) -> InMemoryAgentStore:
     monkeypatch.setattr(ss, "AgentStore", lambda: store)
     # Also patch in the SettingsScreen module itself
     monkeypatch.setattr(
-        "openhands_cli.refactor.modals.settings.settings_screen.AgentStore",
+        "openhands_cli.tui.modals.settings.settings_screen.AgentStore",
         lambda: store,
     )
     return store
